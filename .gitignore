@@ -1,0 +1,5 @@
+*.o
+
+clear
+led-matrix
+test-data
