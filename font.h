@@ -1,3 +1,7 @@
+#ifndef FONT_H 
+#define FONT_H
+
+
 static bool font_0[15] {
 0,1,0,
 1,0,1,
@@ -343,3 +347,5 @@ static bool font_parB[15] {
 0,0,1,
 0,1,0
 };
+
+#endif

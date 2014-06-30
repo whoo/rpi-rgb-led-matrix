@@ -1,4 +1,5 @@
 #include "effect.h"
+#include "font.h"
 
 #define MAXSTAR 20 
 

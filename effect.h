@@ -1,3 +1,7 @@
+#ifndef EFFECT_H
+#define EFFECT_H
+
+
 #include "led-matrix.h"
 #include "thread.h"
 #include <stdlib.h>
@@ -7,7 +11,6 @@
 #include <memory.h>
 #include <time.h>
 #include <unistd.h>
-#include "font.h"
 #include <string>
 #include <fstream>
 
@@ -61,3 +64,4 @@ void putTxt(RGBMatrix *,int,int,std::string,Pixel );
 bool *prinTxt(std::string);
 
 
+#endif
