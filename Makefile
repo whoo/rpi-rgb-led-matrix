@@ -1,7 +1,7 @@
-CFLAGS=-Wall -O3 -g
-CXXFLAGS=-Wall -O3 -g
-OBJECTS=main.o gpio.o led-matrix.o thread.o
-BINARIES=led-matrix
+CFLAGS=-Wall -O3 -g 
+CXXFLAGS=-Wall -O3 -g -std=gnu++0x
+OBJECTS=main.o gpio.o led-matrix.o thread.o effect.o font.o Getdata.o
+BINARIES=led-matrix clear test-data
 LDFLAGS=-lrt -lm -lpthread
 
 all : $(BINARIES)
@@ -12,5 +12,14 @@ main.o: led-matrix.h
 led-matrix : $(OBJECTS)
 	$(CXX) $(CXXFLAGS) $^ -o $@ $(LDFLAGS)
 
-clean:
-	rm -f $(OBJECTS) $(BINARIES)
+clean: 
+	rm -f $(OBJECTS) $(BINARIES) clear.o test-data.o
+
+effect.o: font.h 
+
+test-data: test-data.o Getdata.o  thread.o
+	$(CXX) $(CXXFLAGS) $^ -o $@ $(LDFLAGS)
+
+clear: clear.o gpio.o led-matrix.o
+	$(CXX) $(CXXFLAGS) $^ -o $@ $(LDFLAGS)
+

@@ -1,5 +1,7 @@
 #include "thread.h"
 #include "led-matrix.h"
+#include "effect.h"
+#include "Getdata.h"
 
 #include <assert.h>
 #include <unistd.h>
@@ -8,24 +10,11 @@
 #include <stdlib.h>
 #include <algorithm>
 
+
 using std::min;
 using std::max;
 
-// Base-class for a Thread that does something with a matrix.
-class RGBMatrixManipulator : public Thread {
-public:
-  RGBMatrixManipulator(RGBMatrix *m) : running_(true), matrix_(m) {}
-  virtual ~RGBMatrixManipulator() { running_ = false; }
 
-  // Run() implementation needs to check running_ regularly.
-
-protected:
-  volatile bool running_;  // TODO: use mutex, but this is good enough for now.
-  RGBMatrix *const matrix_;
-};
-
-// Pump pixels to screen. Needs to be high priority real-time because jitter
-// here will make the PWM uneven.
 class DisplayUpdater : public RGBMatrixManipulator {
 public:
   DisplayUpdater(RGBMatrix *m) : RGBMatrixManipulator(m) {}
@@ -39,57 +28,7 @@ public:
 
 // -- The following are demo image generators.
 
-// Simple generator that pulses through RGB and White.
-class ColorPulseGenerator : public RGBMatrixManipulator {
-public:
-  ColorPulseGenerator(RGBMatrix *m) : RGBMatrixManipulator(m) {}
-  void Run() {
-    const int width = matrix_->width();
-    const int height = matrix_->height();
-    uint32_t count = 0;
-    while (running_) {
-      usleep(5000);
-      ++count;
-      int color = (count >> 9) % 6;
-      int value = count & 0xFF;
-      if (count & 0x100) value = 255 - value;
-      int r, g, b;
-      switch (color) {
-      case 0: r = value; g = b = 0; break;
-      case 1: r = g = value; b = 0; break;
-      case 2: g = value; r = b = 0; break;
-      case 3: g = b = value; r = 0; break;
-      case 4: b = value; r = g = 0; break;
-      default: r = g = b = value; break;
-      }
-      for (int x = 0; x < width; ++x)
-        for (int y = 0; y < height; ++y)
-          matrix_->SetPixel(x, y, r, g, b);
-    }
-  }
-};
 
-class SimpleSquare : public RGBMatrixManipulator {
-public:
-  SimpleSquare(RGBMatrix *m) : RGBMatrixManipulator(m) {}
-  void Run() {
-    const int width = matrix_->width();
-    const int height = matrix_->height();
-    // Diagonaly
-    for (int x = 0; x < width; ++x) {
-        matrix_->SetPixel(x, x, 255, 255, 255);
-        matrix_->SetPixel(height -1 - x, x, 255, 0, 255);
-    }
-    for (int x = 0; x < width; ++x) {
-      matrix_->SetPixel(x, 0, 255, 0, 0);
-      matrix_->SetPixel(x, height - 1, 255, 255, 0);
-    }
-    for (int y = 0; y < height; ++y) {
-      matrix_->SetPixel(0, y, 0, 0, 255);
-      matrix_->SetPixel(width - 1, y, 0, 255, 0);
-    }
-  }
-};
 
 // Simple class that generates a rotating block on the screen.
 class RotatingBlockGenerator : public RGBMatrixManipulator {
@@ -153,22 +92,23 @@ private:
 
 class ImageScroller : public RGBMatrixManipulator {
 public:
-  ImageScroller(RGBMatrix *m)
+  ImageScroller(RGBMatrix *m,std::string filename)
     : RGBMatrixManipulator(m), image_(NULL), horizontal_position_(0) {
+	LoadPPM(filename);
   }
 
   // _very_ simplified. Can only read binary P6 PPM. Expects newlines in headers
   // Not really robust. Use at your own risk :)
-  bool LoadPPM(const char *filename) {
+  bool LoadPPM(std::string filename) {
     if (image_) {
       delete [] image_;
       image_ = NULL;
     }
-    FILE *f = fopen(filename, "r");
+    FILE *f = fopen((char*)filename.c_str(), "r");
     if (f == NULL) return false;
     char header_buf[256];
     const char *line = ReadLine(f, header_buf, sizeof(header_buf));
-#define EXIT_WITH_MSG(m) { fprintf(stderr, "%s: %s |%s", filename, m, line); \
+#define EXIT_WITH_MSG(m) { fprintf(stderr, "%s: %s |%s", (char*)filename.c_str(), m, line); \
       fclose(f); return false; }
     if (sscanf(line, "P6 ") == EOF)
       EXIT_WITH_MSG("Can only handle P6 as PPM type.");
@@ -188,7 +128,7 @@ public:
     }
 #undef EXIT_WITH_MSG
     fclose(f);
-    fprintf(stderr, "Read image with %dx%d\n", width_, height_);
+    //fprintf(stderr, "Read image with %dx%d\n", width_, height_);
     horizontal_position_ = 0;
     return true;
   }
@@ -202,12 +142,12 @@ public:
         continue;
       }
       usleep(30 * 1000);
-      for (int x = 0; x < screen_width; ++x) {
-        for (int y = 0; y < screen_height; ++y) {
+      for (int x = 0; x < 32; ++x) {
+        for (int y = 0; y < 16; ++y) {
           const Pixel &p = getPixel((horizontal_position_ + x) % width_, y);
           // Display upside down on my desk. Lets flip :)
-          int disp_x = screen_width - x;
-          int disp_y = screen_height - y;
+          int disp_x = /*screen_width -*/ x;
+          int disp_y = /*screen_height -*/ y;
           matrix_->SetPixel(disp_x, disp_y, p.red, p.green, p.blue);
         }
       }
@@ -244,65 +184,47 @@ private:
 };
 
 int main(int argc, char *argv[]) {
-  int demo = 0;
-  if (argc > 1) {
-    demo = atoi(argv[1]);
-  }
-  fprintf(stderr, "Using demo %d\n", demo);
+	int demo = 0;
+	if (argc > 1) {
+		demo = atoi(argv[1]);
+	}
+	//fprintf(stderr, "Using demo %d\n", demo);
 
-  GPIO io;
-  if (!io.Init())
-    return 1;
+	GPIO io;
+	if (!io.Init())
+		return 1;
 
-  RGBMatrix m(&io);
-    
-  RGBMatrixManipulator *image_gen = NULL;
-  switch (demo) {
-  case 0:
-    image_gen = new RotatingBlockGenerator(&m);
-    break;
+	RGBMatrix m(&io);
 
-  case 1:
-    if (argc > 2) {
-      ImageScroller *scroller = new ImageScroller(&m);
-      if (!scroller->LoadPPM(argv[2]))
-        return 1;
-      image_gen = scroller;
-    } else {
-      fprintf(stderr, "Demo %d Requires PPM image as parameter", demo);
-      return 1;
-    }
-    break;
+	RGBMatrixManipulator *image_gen = NULL;
 
-  case 2:
-    image_gen = new SimpleSquare(&m);
-    break;
+	/*  if (image_gen == NULL) return 1; */
 
-  default:
-    image_gen = new ColorPulseGenerator(&m);
-    break;
-  }
+	RGBMatrixManipulator *updater = new DisplayUpdater(&m);
+	updater->Start(10);  // high priority
 
-  if (image_gen == NULL)
-    return 1;
+	while (1)
+	{
 
-  RGBMatrixManipulator *updater = new DisplayUpdater(&m);
-  updater->Start(10);  // high priority
+		GetData *data = new  GetData('s'); data->Start();
+		image_gen = new ImageScroller(&m,"pixmap/star.ppm"); image_gen->Start(); sleep(30); delete image_gen;
+		image_gen = new Clock(&m); image_gen->Start(); sleep(60); delete image_gen;
+		delete data; data = new  GetData('m'); data->Start();
+		image_gen=new StarField(&m); image_gen->Start(); sleep(60); delete image_gen;
+		image_gen = new Clock(&m); image_gen->Start(); sleep(60); delete image_gen;
+		delete data; data = new  GetData('f'); data->Start();
+		image_gen = new ImageScroller(&m,"pixmap/question.ppm"); image_gen->Start(); sleep(30); delete image_gen;
+		image_gen = new Clock(&m); image_gen->Start(); sleep(60); delete image_gen;
+		image_gen = new ImageScroller(&m,"pixmap/champ.ppm"); image_gen->Start(); sleep(30); delete image_gen;
+		image_gen=new RotatingBlockGenerator(&m); image_gen->Start(); sleep(30); delete image_gen;
+		m.ClearScreen(); m.UpdateScreen(); sleep(180);
+	}
 
-  image_gen->Start();
+	delete updater;
+	// Final thing before exit: clear screen and update once, so that
+	// we don't have random pixels burn
+	m.ClearScreen();
+	m.UpdateScreen();
 
-  // Things are set up. Just wait for <RETURN> to be pressed.
-  printf("Press <RETURN> to exit and reset LEDs\n");
-  getchar();
-
-  // Stopping threads and wait for them to join.
-  delete image_gen;
-  delete updater;
-
-  // Final thing before exit: clear screen and update once, so that
-  // we don't have random pixels burn
-  m.ClearScreen();
-  m.UpdateScreen();
-
-  return 0;
+	return 0;
 }
