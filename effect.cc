@@ -155,28 +155,27 @@ void Table::Run()
 }
 
 void Plasma::Run(){
-        const int w = matrix_->width();
-        const int h = matrix_->height();
+	const int w = matrix_->width();
+	const int h = matrix_->height();
 	int off=0;
 	while (running_)
 	{
-	usleep(1000*50);
-	off+=1;
-	off%=360;
-	
-	for(int x=0;x<w;x++)
-	for(int y=0;y<h;y++)
-		{
-//		int c=128+128*sin((x+off)*6*3.1415/32);
+		usleep(1000*50);
+		off+=1;
+		off%=360;
 
-		int c=(128+128*sin( (sqrt((x-w/2)*(x-w/2)+(y-h/2)*(y-h/2))+off)*2*5*3.1415/32)+
-		128+128*sin((y+off)*6*3.1415/32)+
-		128+128*sin((x+off)*6*3.1415/32)+
-		128+128*sin( (sqrt(x*x+y*y)*2*5*3.1415/32)))/4; 
-		
+		for(int x=0;x<w;x++)
+			for(int y=0;y<h;y++)
+			{
+				//		int c=128+128*sin((x+off)*6*3.1415/32);
 
-		matrix_->SetPixel(x,y,c,255-c,(c*2)&0xff);
-		}
+				int c=(128+128*sin( (sqrt((x-w/2)*(x-w/2)+(y-h/2)*(y-h/2))+off)*2*5*3.1415/32)+
+						128+128*sin((y+off)*6*3.1415/32)+
+						128+128*sin((x+off)*6*3.1415/32)+
+						128+128*sin( (sqrt(x*x+y*y)*2*5*3.1415/32)))/4; 
+
+				matrix_->SetPixel(x,y,c,255-c,(c*2)&0xff);
+			}
 
 	}
 }
