@@ -1,9 +1,6 @@
 #include "effect.h"
 #include "font.h"
 
-#define MAXSTAR 20 
-
-#define CLEARSCR	for (int xe = 0; xe < width; ++xe) for (int ye = 0; ye < height; ++ye) { matrix_->SetPixel(xe,ye, 0,0,0); }
 
 void StarField::Run() {
 			const int width = matrix_->width();
@@ -146,8 +143,6 @@ void Table::Run()
 		usleep(1000*50);
 		angle+=1;
 		angle%=360;
-		int xx=sin(angle*2*3.1415/360);
-		int yy=cos(angle*2*3.1415/360);
 		
 		for(int a=0;a<32*16;a++)
 		{
@@ -159,14 +154,41 @@ void Table::Run()
 
 }
 
+void Plasma::Run(){
+        const int w = matrix_->width();
+        const int h = matrix_->height();
+	int off=0;
+	while (running_)
+	{
+	usleep(1000*50);
+	off+=1;
+	off%=360;
+	
+	for(int x=0;x<w;x++)
+	for(int y=0;y<h;y++)
+		{
+//		int c=128+128*sin((x+off)*6*3.1415/32);
+
+		int c=(128+128*sin( (sqrt((x-w/2)*(x-w/2)+(y-h/2)*(y-h/2))+off)*2*5*3.1415/32)+
+		128+128*sin((y+off)*6*3.1415/32)+
+		128+128*sin((x+off)*6*3.1415/32)+
+		128+128*sin( (sqrt(x*x+y*y)*2*5*3.1415/32)))/4; 
+		
+
+		matrix_->SetPixel(x,y,c,255-c,(c*2)&0xff);
+		}
+
+	}
+}
+
 void Clock::Run(){
 	const int width = matrix_->width();
 	const int height = matrix_->height();
 
-	bool tb[3*8];
+	//bool tb[3*8];
 	bool *txt;
-	int off=0;
 	char buff[20];
+	int off=0;
 
 	std::string t1;
 
@@ -295,3 +317,5 @@ bool *prinTxt(std::string txt)
 	}
 	return tb;
 }
+
+

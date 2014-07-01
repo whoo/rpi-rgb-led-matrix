@@ -134,8 +134,8 @@ public:
   }
 
   void Run() {
-    const int screen_height = matrix_->height();
-    const int screen_width = matrix_->width();
+  //  const int screen_height = matrix_->height();
+  //  const int screen_width = matrix_->width();
     while (running_) {
       if (image_ == NULL) {
         usleep(100 * 1000);
@@ -207,7 +207,8 @@ int main(int argc, char *argv[]) {
 	{
 
 		GetData *data = new  GetData('s'); data->Start();
-		image_gen = new ImageScroller(&m,"pixmap/star.ppm"); image_gen->Start(); sleep(30); delete image_gen;
+//		image_gen = new ImageScroller(&m,"pixmap/star.ppm"); image_gen->Start(); sleep(30); delete image_gen;
+		image_gen = new Plasma(&m); image_gen->Start(); sleep(30); delete image_gen;
 		image_gen = new Clock(&m); image_gen->Start(); sleep(60); delete image_gen;
 		delete data; data = new  GetData('m'); data->Start();
 		image_gen=new StarField(&m); image_gen->Start(); sleep(60); delete image_gen;

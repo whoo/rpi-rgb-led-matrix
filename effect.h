@@ -14,6 +14,10 @@
 #include <string>
 #include <fstream>
 
+#define MAXSTAR 20
+#define CLEARSCR        for (int xe = 0; xe < width; ++xe) for (int ye = 0; ye < height; ++ye) { matrix_->SetPixel(xe,ye, 0,0,0); }
+
+
 class RGBMatrixManipulator : public Thread {
 	public:
 		RGBMatrixManipulator(RGBMatrix *m) : running_(true), matrix_(m) {}
@@ -55,6 +59,14 @@ class Table:public RGBMatrixManipulator {
                 void Run();
 
 };
+
+class Plasma:public RGBMatrixManipulator {
+        public:
+                Plasma(RGBMatrix *m) : RGBMatrixManipulator(m) {}
+                void Run();
+
+};
+
 
 
 /////////// Function 
