@@ -1,6 +1,8 @@
 #ifndef FONT_H 
 #define FONT_H
 
+#include "tools.h"
+#include <string>
 
 static bool font_0[15] {
 0,1,0,
@@ -347,5 +349,18 @@ static bool font_parB[15] {
 0,0,1,
 0,1,0
 };
+
+static bool font_quest[15] {
+0,1,0,
+1,0,1,
+0,0,1,
+0,1,0,
+0,1,0
+};
+
+
+//void putTxt(RGBMatrix *,int,int,std::string,Pixel);
+//bool *prinTxt(std::string txt);
+
 
 #endif

@@ -1,7 +1,7 @@
 CFLAGS=-Wall -O3 -g 
 CXXFLAGS=-Wall -O3 -g -std=gnu++0x
-OBJECTS=main.o gpio.o led-matrix.o thread.o effect.o font.o Getdata.o
-BINARIES=led-matrix clear test-data
+OBJECTS=main.o gpio.o led-matrix.o thread.o effect.o font.o Getdata.o effect2.o
+BINARIES=led-matrix clear test-data launch
 LDFLAGS=-lrt -lm -lpthread
 
 all : $(BINARIES)
@@ -23,3 +23,4 @@ test-data: test-data.o Getdata.o  thread.o
 clear: clear.o gpio.o led-matrix.o
 	$(CXX) $(CXXFLAGS) $^ -o $@ $(LDFLAGS)
 
+launch: launch.cc

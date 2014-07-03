@@ -4,6 +4,7 @@
 
 #include "led-matrix.h"
 #include "thread.h"
+#include "tools.h"
 #include <stdlib.h>
 #include <math.h>
 #include <unistd.h>
@@ -13,19 +14,11 @@
 #include <unistd.h>
 #include <string>
 #include <fstream>
+#include <assert.h>
 
 #define MAXSTAR 20
 #define CLEARSCR        for (int xe = 0; xe < width; ++xe) for (int ye = 0; ye < height; ++ye) { matrix_->SetPixel(xe,ye, 0,0,0); }
 
-
-class RGBMatrixManipulator : public Thread {
-	public:
-		RGBMatrixManipulator(RGBMatrix *m) : running_(true), matrix_(m) {}
-		virtual ~RGBMatrixManipulator() { running_ = false; }
-	protected:
-		volatile bool running_;  // TODO: use mutex, but this is good enough for now.
-		RGBMatrix *const matrix_;
-};
 
 
 class StarField:public RGBMatrixManipulator {
@@ -67,13 +60,35 @@ class Plasma:public RGBMatrixManipulator {
 
 };
 
+class ImageScroller : public RGBMatrixManipulator {
+	public:
+		ImageScroller(RGBMatrix *m,std::string filename) : RGBMatrixManipulator(m), image_(NULL), horizontal_position_(0) 
+		{ LoadPPM(filename); }
+		void Run();
+		bool LoadPPM(std::string);
+	private:
+		// Read line, skip comments.
+		char *ReadLine(FILE *f, char *buffer, size_t len) {
+			char *result;
+			do {
+				result = fgets(buffer, len, f);
+			} while (result != NULL && result[0] == '#');
+			return result;
+		}
+
+		const Pixel &getPixel(int x, int y) {
+			static Pixel dummy;
+			if (x < 0 || x > width_ || y < 0 || y > height_) return dummy;
+			return image_[x + width_ * y];
+		}
+
+		int width_;
+		int height_;
+		Pixel *image_;
+		uint32_t horizontal_position_;
 
 
-/////////// Function 
-
-struct Pixel { uint8_t red; uint8_t green; uint8_t blue; };
-void putTxt(RGBMatrix *,int,int,std::string,Pixel );
-bool *prinTxt(std::string);
+};
 
 
 #endif

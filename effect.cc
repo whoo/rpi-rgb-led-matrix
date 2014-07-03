@@ -1,5 +1,4 @@
 #include "effect.h"
-#include "font.h"
 
 
 void StarField::Run() {
@@ -32,12 +31,8 @@ void StarField::Run() {
 					case 4: b = value; r = g = 0; break;
 					default: r = g = b = value; break;
 				}
-				for (int xe = 0; xe < width; ++xe)
-					for (int ye = 0; ye < height; ++ye)
-					{
-						matrix_->SetPixel(xe,ye, 0,0,0);
-					}
-
+				CLEARSCR;
+				
 				for (a=0;a<MAXSTAR;a++)
 				{
 				x=cos(star[a+MAXSTAR])*star[a]+16;
@@ -158,6 +153,9 @@ void Plasma::Run(){
 	const int w = matrix_->width();
 	const int h = matrix_->height();
 	int off=0;
+
+	int val=rand()%6;
+	
 	while (running_)
 	{
 		usleep(1000*50);
@@ -169,12 +167,20 @@ void Plasma::Run(){
 			{
 				//		int c=128+128*sin((x+off)*6*3.1415/32);
 
-				int c=(128+128*sin( (sqrt((x-w/2)*(x-w/2)+(y-h/2)*(y-h/2))+off)*2*5*3.1415/32)+
-						128+128*sin((y+off)*6*3.1415/32)+
-						128+128*sin((x+off)*6*3.1415/32)+
+				int c=(128+128*sin( (sqrt((x-w/2)*(x-w/2)+(y-h/2)*(y-h/2))+off)*2*3*3.1415/32)+
+						128+128*sin((y+off/2)*6*3.1415/32)+
+						128+128*sin((x+off/2)*6*3.1415/32)+
 						128+128*sin( (sqrt(x*x+y*y)*2*5*3.1415/32)))/4; 
 
-				matrix_->SetPixel(x,y,c,255-c,(c*2)&0xff);
+			switch(val) {
+			case 0: matrix_->SetPixel(x,y,c>>1,c,(c*2)&0xff); break;
+			case 1: matrix_->SetPixel(x,y,c>>1,(c*2)&0xff,c); break;
+			case 2:	matrix_->SetPixel(x,y,c,(c*2)&0xff,c>>1);break;
+			case 3:	matrix_->SetPixel(x,y,c,c>>1,(c*2)&0xff);break;
+			case 4: matrix_->SetPixel(x,y,(c*2)&0xff,c>>1,c);break;
+			case 5: matrix_->SetPixel(x,y,(c*2)&0xff,c,c>>1);break;
+			default: matrix_->SetPixel(32-x,y,c>>1,c,(c*2)&0xff);
+				}
 			}
 
 	}
@@ -198,9 +204,9 @@ void Clock::Run(){
 	getline(infile,t1);
 	txt=prinTxt(t1);
 	Pixel color;
-	color.red=0xff;
-	color.green=0x7c;
-	color.blue=0x08;
+	color.red=(rand()*1000)%0xff;
+	color.green=(rand()*1000)%0xff;
+	color.blue=(rand()*1000)%0xff;
 
 	while (running_)
 	{	
@@ -221,7 +227,7 @@ void Clock::Run(){
 			int y=(a/3)%5+10;
 			if (x>=0 and x<32 and y>=0 and y<16)
 			{
-				matrix_->SetPixel(x,y, 16*txt[a],txt[a],off*txt[a]);
+				matrix_->SetPixel(x,y, txt[a]*x<<3,txt[a]*(y<<2),(255-(x<<3))*txt[a]);
 			}
 		}
 
@@ -242,79 +248,60 @@ void Clock::Run(){
 }
 
 
-void putTxt(RGBMatrix *m,int orig_x,int orig_y,std::string txt,Pixel color )
-{
-	bool *text = prinTxt(txt);
-	for (unsigned int a=0;a<txt.size()*15;a++)
-	{
-		int x=orig_x+a%3+a/15*4;
-		int y=orig_y+(a/3)%5;
-		if (x>=0 and x<m->width() and y>=0 and y<16)
-		{
-			m->SetPixel(x,y, color.red*text[a],color.green*text[a],color.blue*text[a]);
-		}       
-	}
-}
+bool ImageScroller::LoadPPM(std::string filename) {
+    if (image_) {
+      delete [] image_;
+      image_ = NULL;
+    }
+    FILE *f = fopen((char*)filename.c_str(), "r");
+    if (f == NULL) return false;
+    char header_buf[256];
+    const char *line = ReadLine(f, header_buf, sizeof(header_buf));
+#define EXIT_WITH_MSG(m) { fprintf(stderr, "%s: %s |%s", (char*)filename.c_str(), m, line); \
+      fclose(f); return false; }
+    if (sscanf(line, "P6 ") == EOF)
+      EXIT_WITH_MSG("Can only handle P6 as PPM type.");
+    line = ReadLine(f, header_buf, sizeof(header_buf));
+    if (!line || sscanf(line, "%d %d ", &width_, &height_) != 2)
+      EXIT_WITH_MSG("Width/height expected");
+    int value;
+    line = ReadLine(f, header_buf, sizeof(header_buf));
+    if (!line || sscanf(line, "%d ", &value) != 1 || value != 255)
+      EXIT_WITH_MSG("Only 255 for maxval allowed.");
+    const size_t pixel_count = width_ * height_;
+    image_ = new Pixel [ pixel_count ];
+    assert(sizeof(Pixel) == 3);   // we make that assumption.
+    if (fread(image_, sizeof(Pixel), pixel_count, f) != pixel_count) {
+      line = "";
+      EXIT_WITH_MSG("Not enough pixels read.");
+    }
+#undef EXIT_WITH_MSG
+    fclose(f);
+    //fprintf(stderr, "Read image with %dx%d\n", width_, height_);
+    horizontal_position_ = 0;
+    return true;
+  }
 
-bool *prinTxt(std::string txt)
-{
-	bool *tb;
-	tb=(bool*)malloc(3*5*txt.size()*sizeof(bool));
-	memset(tb,0,3*5*txt.size()*sizeof(bool));
-	int off=0;
-	for (unsigned int a=0;a<txt.size();a++)
-	{
-		off=a*15;
-		switch(tolower(txt[a])) {
-			case '0': memcpy(tb+off,font_0,15);break;
-			case '1': memcpy(tb+off,font_1,15);break;
-			case '2': memcpy(tb+off,font_2,15);break;
-			case '3': memcpy(tb+off,font_3,15);break;
-			case '4': memcpy(tb+off,font_4,15);break;
-			case '5': memcpy(tb+off,font_5,15);break;
-			case '6': memcpy(tb+off,font_6,15);break;
-			case '7': memcpy(tb+off,font_7,15);break;
-			case '8': memcpy(tb+off,font_8,15);break;
-			case '9': memcpy(tb+off,font_9,15);break;
-			case 'a': memcpy(tb+off,font_a,15);break;
-			case 'b': memcpy(tb+off,font_b,15);break;
-			case 'c': memcpy(tb+off,font_c,15);break;
-			case 'd': memcpy(tb+off,font_d,15);break;
-			case 'e': memcpy(tb+off,font_e,15);break;
-			case 'f': memcpy(tb+off,font_f,15);break;
-			case 'g': memcpy(tb+off,font_g,15);break;
-			case 'h': memcpy(tb+off,font_h,15);break;
-			case 'i': memcpy(tb+off,font_i,15);break;
-			case 'j': memcpy(tb+off,font_j,15);break;
-			case 'k': memcpy(tb+off,font_k,15);break;
-			case 'l': memcpy(tb+off,font_l,15);break;
-			case 'm': memcpy(tb+off,font_m,15);break;
-			case 'n': memcpy(tb+off,font_n,15);break;
-			case 'o': memcpy(tb+off,font_o,15);break;
-			case 'p': memcpy(tb+off,font_p,15);break;
-			case 'q': memcpy(tb+off,font_q,15);break;
-			case 'r': memcpy(tb+off,font_r,15);break;
-			case 's': memcpy(tb+off,font_s,15);break;
-			case 't': memcpy(tb+off,font_t,15);break;
-			case 'u': memcpy(tb+off,font_u,15);break;
-			case 'v': memcpy(tb+off,font_v,15);break;
-			case 'w': memcpy(tb+off,font_w,15);break;
-			case 'x': memcpy(tb+off,font_x,15);break;
-			case 'y': memcpy(tb+off,font_y,15);break;
-			case 'z': memcpy(tb+off,font_z,15);break;
-			case '.': memcpy(tb+off,font_dot,15);break;
-			case ',': memcpy(tb+off,font_coma,15);break;
-			case '\'': memcpy(tb+off,font_quote,15);break;
-			case '"': memcpy(tb+off,font_2quote,15);break;
-			case '+': memcpy(tb+off,font_plus,15);break;
-			case '-': memcpy(tb+off,font_minus,15);break;
-			case ':': memcpy(tb+off,font_2dot,15);break;
-			case '(': memcpy(tb+off,font_parA,15);break;
-			case ')': memcpy(tb+off,font_parB,15);break;
-			default:  memcpy(tb+off,font_space,15);
-		}
-	}
-	return tb;
-}
+void ImageScroller::Run(){
+  //  const int screen_height = matrix_->height();
+  //  const int screen_width = matrix_->width();
+    while (running_) {
+      if (image_ == NULL) {
+        usleep(100 * 1000);
+        continue;
+      }
+      usleep(30 * 1000);
+      for (int x = 0; x < 32; ++x) {
+        for (int y = 0; y < 16; ++y) {
+          const Pixel &p = getPixel((horizontal_position_ + x) % width_, y);
+          // Display upside down on my desk. Lets flip :)
+          int disp_x = /*screen_width -*/ x;
+          int disp_y = /*screen_height -*/ y;
+          matrix_->SetPixel(disp_x, disp_y, p.red, p.green, p.blue);
+        }
+      }
+      ++horizontal_position_;
+    }
+  }
 
 

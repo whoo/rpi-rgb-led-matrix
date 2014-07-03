@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-# -*- coding: iso8859-1 -*-
+# -*- coding: utf-8 -*-
+
 
 from urllib import request
 import json,random
