@@ -31,7 +31,7 @@ if hasattr(val,'keys'):
 	str=str.replace('ê','e')
 	str=str.replace('à','a')
 else:
-	str="Pas de musique ... c est bien triste tout cela"	
+	str="Pas de musique ... c\'est bien triste tout cela"	
 
 f=open('../data/file','w',encoding='ISO-8859-1')
 f.write(str)
