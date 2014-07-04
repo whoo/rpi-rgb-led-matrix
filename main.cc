@@ -10,6 +10,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <algorithm>
+#include <fcntl.h>
+#include <sys/file.h>
 
 
 using std::min;
@@ -93,13 +95,20 @@ class RotatingBlockGenerator : public RGBMatrixManipulator {
 
 
 int main(int argc, char *argv[]) {
-  srand (time(NULL));
+	srand (time(NULL));
 
-	int demo = 0;
-	if (argc > 1) {
-		demo = atoi(argv[1]);
+	int fd = open("/tmp/led", 'a');
+	int ret = flock(fd,LOCK_EX|LOCK_NB);
+	pid_t pid=getpid();
+
+	dprintf(fd,"%d",pid);
+
+	if (ret!=0) 
+	{
+		fprintf(stderr,"Error: already running");
+		exit(1);
 	}
-	//fprintf(stderr, "Using demo %d\n", demo);
+
 
 	GPIO io;
 	if (!io.Init())
@@ -118,8 +127,8 @@ int main(int argc, char *argv[]) {
 	{
 
 		GetData *data = new  GetData('s'); data->Start();
-//		image_gen = new ImageScroller(&m,"pixmap/star.ppm"); image_gen->Start(); sleep(30); delete image_gen;
-//		image_gen = new Tunnel(&m); image_gen->Start(); sleep(30); delete image_gen;
+		//		image_gen = new ImageScroller(&m,"pixmap/star.ppm"); image_gen->Start(); sleep(30); delete image_gen;
+				image_gen = new Tunnel(&m); image_gen->Start(); sleep(30); delete image_gen;
 		image_gen = new Plasma(&m); image_gen->Start(); sleep(30); delete image_gen;
 		image_gen = new Clock(&m); image_gen->Start(); sleep(60); delete image_gen;
 		delete data; data = new  GetData('m'); data->Start();
