@@ -1,53 +1,52 @@
 #include "effect2.h"
+#define PI_2 2*3.1415926/360
 
-void Tunnel::Run() {
-	Pixel image[64];
+void RotoZoom::Run() {
+//	Pixel *image;
 	int w= matrix_->width();
 	int h= matrix_->height();
 
-
-	int angle[16*32];
-	int distance[16*32];
-
+//	image=	LoadPPM("pixmap/champ.ppm");
+/*
 	for (int a=0;a<64;a++)
 	{
 		image[a].red=(a%8)<<5;
 		image[a].green=(a/8)<<5;
-		image[a].blue=(a+a)<<2;
+		image[a].blue=(255-(a%8))<<5;
 	}
-
+*/
 
 	int off=0;
-	int shiftX,shiftY;
+
+	float costb[360];
+	float sintb[360];
+
+	for (int a=0;a<360;a++)
+	{
+		costb[a]=cos(a*PI_2);
+		sintb[a]=sin(a*PI_2);
+	}
 
 	int xx,yy;
-	int u,v;
-	int a,r;
-	int _u,_v;
 	while(running_)
 	{
 		off+=1;
 		off%=360;	
-		usleep(1000*50);
+		usleep(1000*10);
 
 
-		u=v=0;
 
 		for(int x = 0; x < w; x++)
 		{
-			_u=u;
-			_v=v;
 			for(int y = 0; y < h; y++)
 			{
-				r= sqrt( (x-16)*(x-16) + (y-8)*(y-8))+off;
-				if (x!=16) a=(int)atan( (y-8) / (x-16))*360;
-				
-				u=(int)(r*cos((a+off)*3.14/360))%8;
-				v=(int)(r*sin((a+off)*3.14/360))%8;
 				Pixel d;
-				d=image[abs((u)%8+(v)*8)%64];
+				xx=(costb[off]*(x)-sintb[off]*(y-8))*abs(off-180)*4/360;
+				yy=(sintb[off]*(x)+costb[off]*(y-8))*abs(off-180)*4/360;
+				d=image[((128+xx)%16+((128+yy)%16)*16)%(16*16) ];
 				matrix_->SetPixel(x,y,d.red,d.green,d.blue);
 			}
+
 		}
 
 	}

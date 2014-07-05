@@ -17,10 +17,13 @@
 #include <assert.h>
 
 
-class Tunnel:public RGBMatrixManipulator {
+class RotoZoom:public RGBMatrixManipulator {
         public:
-                Tunnel(RGBMatrix *m) : RGBMatrixManipulator(m) {}
+                RotoZoom(RGBMatrix *m,std::string filename) : RGBMatrixManipulator(m) { image=LoadPPM(filename); }
                 void Run();
+		
+	private:
+		Pixel *image;
 };
 
 
