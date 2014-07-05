@@ -19,7 +19,10 @@ class RGBMatrixManipulator : public Thread {
 struct Pixel { uint8_t red; uint8_t green; uint8_t blue; };
 
 void putTxt(RGBMatrix *,int,int,std::string,Pixel);
-bool *prinTxt(std::string txt);
+bool *prinTxt(std::string);
+Pixel *LoadPPM(std::string); 
+char *ReadLine(FILE *, char *, size_t ) ;
+
 
 
 
