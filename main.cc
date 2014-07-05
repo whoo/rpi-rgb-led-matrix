@@ -128,7 +128,7 @@ int main(int argc, char *argv[]) {
 
 		GetData *data = new  GetData('s'); data->Start();
 		//		image_gen = new ImageScroller(&m,"pixmap/star.ppm"); image_gen->Start(); sleep(30); delete image_gen;
-				image_gen = new Tunnel(&m); image_gen->Start(); sleep(30); delete image_gen;
+				image_gen = new RotoZoom(&m,"pixmap/champ.ppm"); image_gen->Start(); sleep(30); delete image_gen;
 		image_gen = new Plasma(&m); image_gen->Start(); sleep(30); delete image_gen;
 		image_gen = new Clock(&m); image_gen->Start(); sleep(60); delete image_gen;
 		delete data; data = new  GetData('m'); data->Start();
