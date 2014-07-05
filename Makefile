@@ -1,6 +1,6 @@
 CFLAGS=-Wall -O3 -g 
 CXXFLAGS=-Wall -O3 -g -std=gnu++0x
-OBJECTS=main.o gpio.o led-matrix.o thread.o effect.o font.o Getdata.o effect2.o
+OBJECTS=main.o gpio.o led-matrix.o thread.o effect.o font.o Getdata.o effect2.o tools.o
 BINARIES=led-matrix clear test-data launch kill
 LDFLAGS=-lrt -lm -lpthread
 
