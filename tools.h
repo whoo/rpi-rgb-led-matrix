@@ -5,6 +5,8 @@
 #include "led-matrix.h"
 #include <string.h>
 #include <string>
+#define CLEARSCR        for (int xe = 0; xe < width; ++xe) for (int ye = 0; ye < height; ++ye) { matrix_->SetPixel(xe,ye, 0,0,0); }
+
 
 class RGBMatrixManipulator : public Thread {
         public:
@@ -23,7 +25,15 @@ bool *prinTxt(std::string);
 Pixel *LoadPPM(std::string); 
 char *ReadLine(FILE *, char *, size_t ) ;
 
+class ImgPPM {
 
+	public:
+		ImgPPM(std::string);
+		~ImgPPM() { delete image;}
+		int width;
+		int height;
+		Pixel *image;
+};
 
 
 #endif
