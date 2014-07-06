@@ -70,6 +70,7 @@ bool *prinTxt(std::string txt)
 			case '(': memcpy(tb+off,font_parA,15);break;
 			case ')': memcpy(tb+off,font_parB,15);break;
 			case '?': memcpy(tb+off,font_quest,15);break;
+			case '@': memcpy(tb+off,font_arobase,15);break;
 			default:  memcpy(tb+off,font_space,15);
 		}
 	}

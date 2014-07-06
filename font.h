@@ -358,6 +358,13 @@ static bool font_quest[15] {
 0,1,0
 };
 
+static bool font_arobase[15] {
+1,1,0,
+0,0,1,
+0,1,1,
+1,0,1,
+1,1,1
+};
 
 //void putTxt(RGBMatrix *,int,int,std::string,Pixel);
 //bool *prinTxt(std::string txt);
