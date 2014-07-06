@@ -27,5 +27,11 @@ class RotoZoom:public RGBMatrixManipulator {
 };
 
 
+class RotoStar:public RGBMatrixManipulator {
+	public:
+		RotoStar(RGBMatrix *m) : RGBMatrixManipulator(m) {}
+		void Run();
+
+};
 
 #endif

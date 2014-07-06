@@ -17,7 +17,6 @@
 #include <assert.h>
 
 #define MAXSTAR 20
-#define CLEARSCR        for (int xe = 0; xe < width; ++xe) for (int ye = 0; ye < height; ++ye) { matrix_->SetPixel(xe,ye, 0,0,0); }
 
 
 
