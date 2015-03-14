@@ -34,4 +34,12 @@ class RotoStar:public RGBMatrixManipulator {
 
 };
 
+class RotoZoom2:public RGBMatrixManipulator {
+	public:
+		RotoZoom2(RGBMatrix *m,std::string filename) : RGBMatrixManipulator(m) { image=LoadPPM(filename); }
+		void Run();
+	private:
+		Pixel *image;
+};
+
 #endif

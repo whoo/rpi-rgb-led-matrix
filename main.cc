@@ -127,21 +127,29 @@ int main(int argc, char *argv[]) {
 
 		GetData *data = new  GetData('s'); data->Start();
 		//	image_gen = new ImageScroller(&m,"pixmap/star.ppm"); image_gen->Start(); sleep(30); delete image_gen;
-		//	image_gen = new ImageScroller(&m,"pixmap/champ.ppm"); image_gen->Start(); sleep(30); delete image_gen;
-		image_gen = new RotoStar(&m); image_gen->Start();  sleep(30); delete image_gen;
+		image_gen = new RotoZoom2(&m,"pixmap/champ.ppm"); image_gen->Start(); sleep(30); delete image_gen;
+
+		image_gen=new RotoStar(&m); image_gen->Start(); sleep(30); delete image_gen;
 		image_gen = new Plasma(&m); image_gen->Start(); sleep(30); delete image_gen;
 		image_gen = new Clock(&m); image_gen->Start(); sleep(60); delete image_gen;
+
 		delete data; data = new  GetData('m'); data->Start();
 		image_gen=new StarField(&m); image_gen->Start(); sleep(60); delete image_gen;
 		image_gen = new Clock(&m); image_gen->Start(); sleep(60); delete image_gen;
+
 		delete data; data = new  GetData('f'); data->Start();
-		image_gen = new ImageScroller(&m,"pixmap/question.ppm"); image_gen->Start(); sleep(30); delete image_gen;
+		image_gen = new RotoZoom(&m,"pixmap/question.ppm"); image_gen->Start(); sleep(30); delete image_gen;
 		image_gen = new Clock(&m); image_gen->Start(); sleep(60); delete image_gen;
+
 		delete data;  data = new  GetData('n'); data->Start();
-		image_gen = new RotoZoom(&m,"pixmap/champ.ppm"); image_gen->Start(); sleep(30); delete image_gen;
+		image_gen = new RotoZoom(&m,"pixmap/star.ppm"); image_gen->Start(); sleep(30); delete image_gen;
 		image_gen = new Clock(&m); image_gen->Start(); sleep(360); delete image_gen;
+
+		delete data; data = new  GetData('t'); data->Start();
+		image_gen=new RotoStar(&m); image_gen->Start(); sleep(30); delete image_gen;
+		image_gen = new Clock(&m); image_gen->Start(); sleep(360); delete image_gen;
+
 		delete data;
-		image_gen=new RotatingBlockGenerator(&m); image_gen->Start(); sleep(30); delete image_gen;
 		m.ClearScreen(); m.UpdateScreen(); sleep(180);
 	}
 

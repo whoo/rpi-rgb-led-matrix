@@ -13,6 +13,7 @@ void GetData::Run() {
 		case 's': strcpy(cmd,"./scripts/song.py"); strcpy(argv,"song.py"); break;
 		case 'f': strcpy(cmd,"./scripts/file.sh"); strcpy(argv,"file.sh"); break;
 		case 'n': strcpy(cmd,"./scripts/news.py"); strcpy(argv,"news.py"); break;
+		case 't': strcpy(cmd,"./scripts/twitt.py"); strcpy(argv,"twitt.py"); break;
 		default:         strcpy(cmd,"./scripts/meteo.py"); strcpy(argv,"meteo.py"); break;
 	}
 

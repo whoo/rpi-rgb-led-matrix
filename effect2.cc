@@ -40,6 +40,44 @@ void RotoZoom::Run() {
 	}
 }
 
+void RotoZoom2::Run() {
+	int w= matrix_->width();
+	int h= matrix_->height();
+	int off=0;
+
+	float costb[360];
+	float sintb[360];
+
+	for (int a=0;a<360;a++)
+	{
+		costb[a]=cos(a*PI_2);
+		sintb[a]=sin(a*PI_2);
+	}
+
+	int xx,yy;
+	while(running_)
+	{
+		off+=1;
+		off%=360;	
+		usleep(1000*10);
+
+		for(int x = 0; x < w/2; x++)
+		{
+			for(int y = 0; y < h; y++)
+			{
+				Pixel d;
+				xx=(costb[off]*(x)-sintb[off]*(y-8))*abs(off-180)*4/360;
+				yy=(sintb[off]*(x)+costb[off]*(y-8))*abs(off-180)*4/360;
+				d=image[((128+xx)%16+((128+yy)%16)*16)%(16*16) ];
+				matrix_->SetPixel(x,y,d.red,d.green,d.blue);
+				matrix_->SetPixel(32-x,16-y,d.red,d.green,d.blue);
+			}
+
+		}
+
+	}
+}
+
 
 
 void RotoStar::Run() {
@@ -62,6 +100,7 @@ void RotoStar::Run() {
 	while (running_) {
 		usleep(50000);
 		CLEARSCR;
+		off=(off+1)%255;
 		for (a=0;a<MAXSTAR;a++)
 		{
 			x=16+cos(star[a+MAXSTAR]*PI_2)*star[a];
@@ -75,7 +114,7 @@ void RotoStar::Run() {
 			}
 			else
 			{
-				matrix_->SetPixel(x,y,star[a]<<4,star[a]<<3,star[a]<<4);
+				matrix_->SetPixel(x,y,star[a]<<4,(star[a]+off)<<3,255-(star[a]<<2));
 			}
 		}
 
