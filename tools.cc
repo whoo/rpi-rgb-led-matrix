@@ -35,3 +35,23 @@ char *ReadLine(FILE *f, char *buffer, size_t len) {
                         return result;
                 }
 
+
+std::string randomfile()
+{
+        DIR     *Dir=opendir("pixmap");
+        struct  dirent *list;
+
+        std::vector<std::string> vList;
+
+        srand(time(NULL));
+
+        while ( list=readdir(Dir) )
+        {
+                vList.push_back(list->d_name);
+        }
+
+        closedir(Dir);
+        std::cout<<vList.size();
+        return "pixmap/"+vList.at(2+rand()%(vList.size()-2));
+}
+

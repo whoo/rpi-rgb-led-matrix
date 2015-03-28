@@ -4,7 +4,11 @@
 #include "thread.h"
 #include "led-matrix.h"
 #include <string.h>
+#include <dirent.h>
 #include <string>
+#include <vector>
+#include <iostream>
+
 #define CLEARSCR        for (int xe = 0; xe < width; ++xe) for (int ye = 0; ye < height; ++ye) { matrix_->SetPixel(xe,ye, 0,0,0); }
 
 
@@ -24,6 +28,7 @@ void putTxt(RGBMatrix *,int,int,std::string,Pixel);
 bool *prinTxt(std::string);
 Pixel *LoadPPM(std::string); 
 char *ReadLine(FILE *, char *, size_t ) ;
+std::string randomfile();
 
 class ImgPPM {
 
