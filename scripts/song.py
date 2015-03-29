@@ -10,9 +10,9 @@ chdir('/home/Users/dominique/display16x32/dd/scripts');
 accroche=['du fun avec','le plaisir d\'ecouter','du son dans la maison:','dansons avec','chanton avec','la vie en musique,','trop cool','ca groove avec']
 url='http://wizz/mpd/run.php?cmd=currentsong'
 
-data=request.urlopen(url)
-val=json.loads(data.read().decode('utf-8'))
-
+#data=request.urlopen(url)
+#val=json.loads(data.read().decode('utf-8'))
+val=1
 
 if hasattr(val,'keys'):
 	if "Artist" in val.keys():
@@ -32,6 +32,8 @@ if hasattr(val,'keys'):
 	str=str.replace('à','a')
 else:
 	str="Pas de musique ... c\'est bien triste tout cela"	
+
+str="... ... ..."
 
 f=open('../data/file','w',encoding='ISO-8859-1')
 f.write(str)

@@ -40,18 +40,20 @@ std::string randomfile()
 {
         DIR     *Dir=opendir("pixmap");
         struct  dirent *list;
+	std::string dd;
 
         std::vector<std::string> vList;
 
-        srand(time(NULL));
-
         while ( list=readdir(Dir) )
         {
+		if (list->d_name[0]!='.')
                 vList.push_back(list->d_name);
         }
 
         closedir(Dir);
         std::cout<<vList.size();
-        return "pixmap/"+vList.at(2+rand()%(vList.size()-2));
+	dd=vList.at(2+rand()%(vList.size()-2));
+		std::cerr<<dd;
+        return "pixmap/"+dd;
 }
 
