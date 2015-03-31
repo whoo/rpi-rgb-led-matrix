@@ -4,15 +4,20 @@
 from lxml import etree
 from urllib import request
 from os import chdir
+import random
 
 chdir('/home/Users/dominique/display16x32/dd/scripts');
 
+url={}
 
-url="http://www.france24.com/fr/actualites/rss/"
-url="http://www.france24.com/fr/europe/rss/"
-url="http://rss.lapresse.ca/179.xml"
-url="https://news.google.com/news/feeds?pz=1&cf=all&ned=fr&hl=fr&topic=t&output=rss"
-url="https://news.google.com/news/feeds?pz=1&cf=all&ned=fr&hl=fr&output=rss"
+url[0]="http://www.france24.com/fr/actualites/rss/"
+url[1]="http://www.france24.com/fr/europe/rss/"
+url[2]="http://rss.lapresse.ca/179.xml"
+url[3]="https://news.google.com/news/feeds?pz=1&cf=all&ned=fr&hl=fr&topic=t&output=rss"
+url[4]="https://news.google.com/news/feeds?pz=1&cf=all&ned=fr&hl=fr&output=rss"
+
+url=url[int(random.randint(1,100)%len(url))]
+
 xml=request.urlopen(url).read();
 root = etree.fromstring(xml)
 
