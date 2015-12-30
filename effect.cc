@@ -154,7 +154,7 @@ void Plasma::Run(){
 	const int h = matrix_->height();
 	int off=0;
 
-	int val=rand()%6;
+	int val=rand()%8;
 	
 	while (running_)
 	{

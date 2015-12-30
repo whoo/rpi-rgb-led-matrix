@@ -63,6 +63,8 @@ bool *prinTxt(std::string txt)
 			case '.': memcpy(tb+off,font_dot,15);break;
 			case ',': memcpy(tb+off,font_coma,15);break;
 			case '\'': memcpy(tb+off,font_quote,15);break;
+			case '/': memcpy(tb+off,font_slash,15);break;
+			case '\\': memcpy(tb+off,font_aslash,15);break;
 			case '"': memcpy(tb+off,font_2quote,15);break;
 			case '+': memcpy(tb+off,font_plus,15);break;
 			case '-': memcpy(tb+off,font_minus,15);break;

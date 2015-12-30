@@ -3,6 +3,7 @@
 #include "effect.h"
 #include "effect2.h"
 #include "Getdata.h"
+#include "pasa.h"
 
 #include <assert.h>
 #include <unistd.h>
@@ -66,8 +67,11 @@ int main(int argc, char *argv[]) {
 	while (1)
 	{
 
+		image_gen = new Spectrum(&m); image_gen->Start(); sleep(60); delete image_gen;
+
 		GetData *data = new  GetData('s'); data->Start();
-		//	image_gen = new ImageScroller(&m,"pixmap/star.ppm"); image_gen->Start(); sleep(30); delete image_gen;
+
+
 		image_gen = new RotoZoom2(&m,randomfile()); image_gen->Start(); sleep(30); delete image_gen;
 
 

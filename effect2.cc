@@ -18,6 +18,7 @@ void RotoZoom::Run() {
 	}
 
 	int xx,yy;
+//	CLEARSCR;
 	while(running_)
 	{
 		off+=1;
@@ -41,8 +42,8 @@ void RotoZoom::Run() {
 }
 
 void RotoZoom2::Run() {
-	int w= matrix_->width();
-	int h= matrix_->height();
+	int width= matrix_->width();
+	int height= matrix_->height();
 	int off=0;
 
 	float costb[360];
@@ -55,22 +56,23 @@ void RotoZoom2::Run() {
 	}
 
 	int xx,yy;
+	CLEARSCR;
 	while(running_)
 	{
 		off+=1;
 		off%=360;	
 		usleep(1000*10);
 
-		for(int x = 0; x < w/2; x++)
+		for(int x = 0; x < width/2; x++)
 		{
-			for(int y = 0; y < h; y++)
+			for(int y = 0; y < height; y++)
 			{
 				Pixel d;
 				xx=(costb[off]*(x)-sintb[off]*(y-8))*abs(off-180)*4/360;
 				yy=(sintb[off]*(x)+costb[off]*(y-8))*abs(off-180)*4/360;
 				d=image[((128+xx)%16+((128+yy)%16)*16)%(16*16) ];
 				matrix_->SetPixel(x,y,d.red,d.green,d.blue);
-				matrix_->SetPixel(32-x,16-y,d.red,d.green,d.blue);
+				matrix_->SetPixel(31-x,15-y,d.red,d.green,d.blue);
 			}
 
 		}

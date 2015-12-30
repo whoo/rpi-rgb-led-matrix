@@ -1,39 +1,36 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 
+from lxml import etree
 from urllib import request
-import json,random
 from os import chdir
+import random
 
 chdir('/home/Users/dominique/display16x32/dd/scripts');
-accroche=['du fun avec','le plaisir d\'ecouter','du son dans la maison:','dansons avec','chanton avec','la vie en musique,','trop cool','ca groove avec']
-url='http://wizz/mpd/run.php?cmd=currentsong'
 
-#data=request.urlopen(url)
-#val=json.loads(data.read().decode('utf-8'))
-val=1
+url={}
 
-if hasattr(val,'keys'):
-	if "Artist" in val.keys():
-		artist=val['Artist']
-	else:
-		artist="illustre inconnu";
-	
-	if "Title" in val.keys():
-		titre=val['Title']
-	else:
-		titre='heu ... je sais pas'	
+url[0]="http://www.france24.com/fr/actualites/rss/"
+url[1]="http://www.france24.com/fr/europe/rss/"
+url[2]="http://rss.lapresse.ca/179.xml"
+url[3]="https://news.google.com/news/feeds?pz=1&cf=all&ned=fr&hl=fr&topic=t&output=rss"
+url[4]="https://news.google.com/news/feeds?pz=1&cf=all&ned=fr&hl=fr&output=rss"
 
-	str=accroche[random.randint(0,len(accroche)-1)] + " \"%s\" de %s"%(titre,artist)
-	str=str.replace('é','e')
-	str=str.replace('è','e')
-	str=str.replace('ê','e')
-	str=str.replace('à','a')
-else:
-	str="Pas de musique ... c\'est bien triste tout cela"	
+url=url[int(random.randint(1,100)%len(url))]
 
-str="... ... ..."
+xml=request.urlopen(url).read();
+root = etree.fromstring(xml)
+
+str=""
+for item in enumerate(root.xpath("//item/title")):
+	str+="%s\n"%(item[1].text)
+# print(item[1][3].text)
+str=str.replace('é','e')
+str=str.replace('è','e')
+str=str.replace('ê','e')
+str=str.replace('à','a')
+str=str.replace('ô','o')
+str=str.replace('’','\'')
 
 f=open('../data/file','w',encoding='ISO-8859-1')
 f.write(str)

@@ -12,6 +12,12 @@ int main(int argc,char **argv)
 
 	if (pid==0)
 	{
+
+		setenv("HOME","/root",1);
+		setenv("USER","root",1);
+		setenv("USERNAME","root",1);
+		setenv("LOGNAME","root",1);
+	
 		char cmd[]="./led-matrix";
 		char argv[]="./led-matrix";
 		close(STDIN_FILENO);
