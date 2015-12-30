@@ -12,7 +12,7 @@ double gain = 4.0;
 // hanning window.
 float windowFunction(int n, int N)
 {       
-        return 0.5f * (1.0f - cosf(2.0f * M_PI * n / (N - 1.0f)));
+        return (float) 0.5f * (1.0f - cosf(2.0f * M_PI * n / (N - 1.0f)));
 }
 
 void calculateBars(fftw_complex* fft, int fftSize, int* bars, int numBars)
@@ -21,7 +21,7 @@ void calculateBars(fftw_complex* fft, int fftSize, int* bars, int numBars)
         double barWidthD = upperFrequency / (framesPerSecond * numBars);
         int barWidth = (int)ceil(barWidthD);
                                 
-        double scale = 2.0 / fftSize * gain;
+        double scale = 3.0 / fftSize * 50;
 
         // interpolate bars. 
         int i = 0;              
@@ -54,7 +54,7 @@ void Spectrum::Run()
 {
 	const int width = matrix_->width();
 	const int height = matrix_->height();
-	static const pa_sample_spec ss = { PA_SAMPLE_S16LE ,44100,2};
+	static const pa_sample_spec ss = { PA_SAMPLE_FLOAT32LE ,44100,2};
 	int error;
 
 
@@ -68,9 +68,9 @@ void Spectrum::Run()
 	for(int n = 0; n < size; n++)
                 window[n] = windowFunction(n, size);
 
-//        double *in = (double*)fftw_malloc(sizeof(double) * size);
-//        fftw_complex *out = (fftw_complex*)fftw_malloc(sizeof(fftw_complex) * size);
-//        fftw_plan plan = fftw_plan_dft_r2c_1d(size, in, out, FFTW_MEASURE);
+        double *in = (double*)fftw_malloc(sizeof(double) * size);
+        fftw_complex *out = (fftw_complex*)fftw_malloc(sizeof(fftw_complex) * size);
+        fftw_plan plan = fftw_plan_dft_r2c_1d(size, in, out, FFTW_MEASURE);
 
 
 	while(running_)
@@ -80,43 +80,42 @@ void Spectrum::Run()
 		int buff[ss.channels * size];
 		int link=0;
 
+
+		pa_simple_drain(s,&error);
 		CLEARSCR;
-		if ( pa_simple_read(s, buff, sizeof(buff), &error) < 0)
+		if ( pa_simple_read(s, buffer, sizeof(buffer), &error) < 0)
 		{
 			fprintf(stderr,"started %s\n",pa_strerror(error));
 			pa_simple_free(s);
 			return;
 		}
 
-		int maxval=0;
-		int maxval2=0;
+		
 
-		for (int a=0;a<size;a+=2)
-		{
-			maxval=(fabs(buff[a])>maxval)?fabs(buff[a]):maxval;
-			maxval2=(fabs(buff[a+1])>maxval2)?fabs(buff[a+1]):maxval2;
-
-			if ((a/34) > link )
-			{
-				barsL[link]=maxval%16;
-				barsL[32-link]=maxval2%16;		
-				link=a/34;
-				maxval=maxval2=0;
-			}
-
-		}
+		//fprintf(stderr,"sample %f\n ",buffer[2*2]);
+		for(int i = 0; i < size; i++) in[i] = (double)(window[i] * buffer[i * 2]);
+		//fprintf(stderr,"sample %f\n ",in[2]);
+                fftw_execute(plan);
+		calculateBars(out,size,barsL,16);
+		//fprintf(stderr,"sample %f\n ",buffer[2*2]);
+		for(int i = 0; i < size; i++) in[i] = (double)(window[i] * buffer[i * 2+1]);
+		//fprintf(stderr,"sample %f\n ",in[2]);
+                fftw_execute(plan);
+		calculateBars(out,size,barsR,16);
 
 
 
-		for (int a=0;a<32;a++)
+
+
+		for (int a=0;a<16;a++)
 		{
 //			fprintf(stderr,"%d ",barsL[a]);
-			for (int b=0;b<barsL[a];b++)
-				matrix_->SetPixel(a,16-b,128,255,0);
+			for (int b=0;b<barsL[a];b++) matrix_->SetPixel(a,16-b,128, (b<5)?255:0,0);
+			for (int b=0;b<barsR[a];b++) matrix_->SetPixel(31-a,16-b,128,(b<5)?255:0,0);
 		}
 //		fprintf(stderr,"\n");
 
-			usleep(1000*90);
+		usleep(1000*40);
 	}
 
 	pa_simple_free(s);
