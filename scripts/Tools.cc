@@ -26,7 +26,7 @@ std::string utf8toiso(std::string chaine)
 		dst.append(&buf[0],buf.size()-dst_size);
 		if (res == (size_t)-1)
 		{
-			printf("Error convert [%s] %ld next string [%s]\n",dst.c_str(),dst.size(),src_ptr);
+//			printf("Error convert [%s] %ld next string [%s]\n",dst.c_str(),dst.size(),src_ptr);
 			src_ptr++;
 			src_size--;
 			dst_ptr = &buf[0];

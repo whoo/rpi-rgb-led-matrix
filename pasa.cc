@@ -49,7 +49,6 @@ void calculateBars(fftw_complex* fft, int fftSize, int* bars, int numBars)
 }   
 
 
-
 void Spectrum::Run()
 {
 	const int width = matrix_->width();
@@ -61,7 +60,7 @@ void Spectrum::Run()
 	pa_simple *s = pa_simple_new(NULL, "pasa", PA_STREAM_RECORD, NULL , "record",&ss, NULL, NULL, &error);
 	if (!s) fprintf(stderr,"Error %s",pa_strerror(error));
 
-	const int size = ss.rate / 40;
+	const int size = ss.rate / 30;
 	float window[size];
 	float buffer[ss.channels * size];
 
@@ -81,7 +80,8 @@ void Spectrum::Run()
 		int link=0;
 
 
-		pa_simple_drain(s,&error);
+		pa_simple_flush(s,&error);
+		//fprintf(stderr,"%d",	pa_simple_get_latency(s,&error));
 		CLEARSCR;
 		if ( pa_simple_read(s, buffer, sizeof(buffer), &error) < 0)
 		{
@@ -96,26 +96,31 @@ void Spectrum::Run()
 		for(int i = 0; i < size; i++) in[i] = (double)(window[i] * buffer[i * 2]);
 		//fprintf(stderr,"sample %f\n ",in[2]);
                 fftw_execute(plan);
-		calculateBars(out,size,barsL,16);
+		calculateBars(out,size,barsL,8);
 		//fprintf(stderr,"sample %f\n ",buffer[2*2]);
 		for(int i = 0; i < size; i++) in[i] = (double)(window[i] * buffer[i * 2+1]);
 		//fprintf(stderr,"sample %f\n ",in[2]);
                 fftw_execute(plan);
-		calculateBars(out,size,barsR,16);
+		calculateBars(out,size,barsR,8);
 
-
-
-
-
-		for (int a=0;a<16;a++)
+		for (int a=0;a<8;a++)
 		{
 //			fprintf(stderr,"%d ",barsL[a]);
-			for (int b=0;b<barsL[a];b++) matrix_->SetPixel(a,16-b,128, (b<5)?255:0,0);
-			for (int b=0;b<barsR[a];b++) matrix_->SetPixel(31-a,16-b,128,(b<5)?255:0,0);
+			for (int b=0;b<barsL[8-a];b++) 
+			{
+			matrix_->SetPixel(2*a,16-b,128, (b<6)?255:0,(b<10)?b<<2:0);
+			matrix_->SetPixel(2*a+1,16-b,128, (b<6)?255:0,(b<10)?b<<2:0);
+			}
+			for (int b=0;b<barsL[8-a];b++)
+			 {
+				matrix_->SetPixel(31-(2*a),16-b,128,(b<6)?255:0,(b<10)?b<<2:0);
+				matrix_->SetPixel(31-(2*a+1),16-b,128,(b<6)?255:0,(b<10)?b<<2:0);
+				}
 		}
 //		fprintf(stderr,"\n");
 
-		usleep(1000*40);
+		pa_simple_flush(s,&error);
+		usleep(1000*10);
 	}
 
 	pa_simple_free(s);

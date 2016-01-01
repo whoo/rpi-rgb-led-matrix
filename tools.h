@@ -40,5 +40,17 @@ class ImgPPM {
 		Pixel *image;
 };
 
+class DisplayUpdater : public RGBMatrixManipulator {
+	public:
+		DisplayUpdater(RGBMatrix *m) : RGBMatrixManipulator(m) {}
+
+		void Run() {
+			while (running_) {
+				matrix_->UpdateScreen();
+			}
+		}
+};
+
+
 
 #endif

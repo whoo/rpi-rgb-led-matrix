@@ -25,8 +25,6 @@ Pixel *LoadPPM(std::string filename) {
     //horizontal_position_ = 0;
     return image_;
   }
-
-
 char *ReadLine(FILE *f, char *buffer, size_t len) {
                         char *result;
                         do {
@@ -35,9 +33,7 @@ char *ReadLine(FILE *f, char *buffer, size_t len) {
                         return result;
                 }
 
-
-std::string randomfile()
-{
+std::string randomfile() {
         DIR     *Dir=opendir("pixmap");
         struct  dirent *list;
 	std::string dd;

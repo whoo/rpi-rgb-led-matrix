@@ -2,7 +2,7 @@
 
 int main()
 {
-	GetData *data = new  GetData('f');
+	GetData *data = new  GetData('n');
 	data->Start();
 	while (1)
 	{
