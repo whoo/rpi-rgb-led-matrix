@@ -81,7 +81,10 @@ void Spectrum::Run()
 
 
 		pa_simple_flush(s,&error);
-		//fprintf(stderr,"%d",	pa_simple_get_latency(s,&error));
+//		fprintf(stderr,"%d",	pa_simple_get_latency(s,&error));
+		pa_simple_drain(s,&error);
+
+
 		CLEARSCR;
 		if ( pa_simple_read(s, buffer, sizeof(buffer), &error) < 0)
 		{

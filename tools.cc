@@ -47,9 +47,9 @@ std::string randomfile() {
         }
 
         closedir(Dir);
-        std::cout<<vList.size();
+//        std::cout<<vList.size();
 	dd=vList.at(rand()%vList.size());
-		std::cerr<<dd;
+	//	std::cerr<<dd;
         return "pixmap/"+dd;
 }
 
