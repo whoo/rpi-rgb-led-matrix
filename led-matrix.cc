@@ -71,6 +71,9 @@ RGBMatrix::RGBMatrix(GPIO *io) : io_(io) {
   ClearScreen();
 }
 
+RGBMatrix::RGBMatrix():io_(NULL) {
+}
+
 void RGBMatrix::ClearScreen() {
   memset(&bitplane_, 0, sizeof(bitplane_));
 }

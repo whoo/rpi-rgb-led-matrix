@@ -12,6 +12,7 @@
 class RGBMatrix {
  public:
   RGBMatrix(GPIO *io);
+  RGBMatrix();
   void ClearScreen();
 
   // Here the set-up  [>] - Only one 16x32 panel

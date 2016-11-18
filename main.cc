@@ -19,10 +19,36 @@ using std::min;
 using std::max;
 
 
+	RGBMatrixManipulator *image_gen = NULL;
+
+	GPIO io;
+	void *l;
+
+	void sig_handler(int signo) {
+		if (signo == SIGINT)
+		{
+			printf("Kick me");
+			sleep(10);
+			delete image_gen;
+			{
+				((RGBMatrix*)l )->ClearScreen();
+				((RGBMatrix*)l )->UpdateScreen();
+			}
+
+			printf("kill ok");
+			exit(2);
+
+		}
+	}
+
+
 
 
 int main(int argc, char *argv[]) {
 	srand (time(NULL));
+
+  if (signal(SIGINT, sig_handler) == SIG_ERR)
+        printf("\ncan't catch SIGKILL\n");
 
 	int fd = open("/tmp/led", 'a');
 	int ret = flock(fd,LOCK_EX|LOCK_NB);
@@ -42,7 +68,9 @@ int main(int argc, char *argv[]) {
 		return 1;
 
 	RGBMatrix m(&io);
-	RGBMatrixManipulator *image_gen = NULL;
+
+	l=&m;
+
 
 	/*  if (image_gen == NULL) return 1; */
 
@@ -53,7 +81,9 @@ int main(int argc, char *argv[]) {
 	{
 
 		GetData *data = new  GetData('m'); data->Start();
-		image_gen = new Spectrum(&m); image_gen->Start(); sleep(60); delete image_gen;
+		image_gen = new Plasma(&m); image_gen->Start(); sleep(60); delete image_gen;
+
+//		image_gen = new Spectrum(&m); image_gen->Start(); sleep(60); delete image_gen;
 
 		image_gen = new Clock(&m); image_gen->Start(); sleep(180); delete image_gen;
 
