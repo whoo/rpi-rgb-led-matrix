@@ -28,7 +28,7 @@ using std::max;
 		if (signo == SIGINT)
 		{
 			printf("Kick me");
-			sleep(10);
+			sleep(1);
 			delete image_gen;
 			{
 				((RGBMatrix*)l )->ClearScreen();
@@ -81,37 +81,38 @@ int main(int argc, char *argv[]) {
 	{
 
 		GetData *data = new  GetData('m'); data->Start();
+
+		image_gen = new RotoZoom(&m,randomfile()); image_gen->Start(); sleep(30); delete image_gen;
 		image_gen = new Plasma(&m); image_gen->Start(); sleep(60); delete image_gen;
 
 //		image_gen = new Spectrum(&m); image_gen->Start(); sleep(60); delete image_gen;
 
-		image_gen = new Clock(&m); image_gen->Start(); sleep(180); delete image_gen;
-
-		delete data; data = new  GetData('n'); data->Start();
+//		image_gen = new Clock(&m); image_gen->Start(); sleep(180); delete image_gen;
+//		delete data; data = new  GetData('n'); data->Start();
 		image_gen = new RotoZoom2(&m,randomfile()); image_gen->Start(); sleep(30); delete image_gen;
 
-		image_gen = new Clock(&m); image_gen->Start(); sleep(180); delete image_gen;
+//		image_gen = new Clock(&m); image_gen->Start(); sleep(180); delete image_gen;
 		image_gen = new Plasma(&m); image_gen->Start(); sleep(60); delete image_gen;
 
 
-		image_gen = new Clock(&m); image_gen->Start(); sleep(60); delete image_gen;
+//		image_gen = new Clock(&m); image_gen->Start(); sleep(60); delete image_gen;
 		image_gen=new RotoStar(&m); image_gen->Start(); sleep(60); delete image_gen;
 
 		delete data; data = new  GetData('n'); data->Start();
 		image_gen=new StarField(&m); image_gen->Start(); sleep(60); delete image_gen;
 		image_gen = new Clock(&m); image_gen->Start(); sleep(60); delete image_gen;
 
-		delete data; data = new  GetData('f'); data->Start();
+//		delete data; data = new  GetData('f'); data->Start();
 		image_gen = new RotoZoom(&m,randomfile()); image_gen->Start(); sleep(30); delete image_gen;
-		image_gen = new Clock(&m); image_gen->Start(); sleep(60); delete image_gen;
+//		image_gen = new Clock(&m); image_gen->Start(); sleep(60); delete image_gen;
 
-		delete data;  data = new  GetData('n'); data->Start();
+//		delete data;  data = new  GetData('n'); data->Start();
 		image_gen = new RotoZoom2(&m,randomfile()); image_gen->Start(); sleep(30); delete image_gen;
-		image_gen = new Clock(&m); image_gen->Start(); sleep(360); delete image_gen;
+//		image_gen = new Clock(&m); image_gen->Start(); sleep(360); delete image_gen;
 
 		delete data; data = new  GetData('n'); data->Start();
 		image_gen=new RotoStar(&m); image_gen->Start(); sleep(30); delete image_gen;
-		image_gen = new Clock(&m); image_gen->Start(); sleep(360); delete image_gen;
+//		image_gen = new Clock(&m); image_gen->Start(); sleep(360); delete image_gen;
 
 		delete data;
 		m.ClearScreen(); m.UpdateScreen(); sleep(180);

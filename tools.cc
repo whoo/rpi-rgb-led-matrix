@@ -1,11 +1,11 @@
 #include "tools.h"
-#define EXIT_WITH_MSG(m) { fprintf(stderr, "%s: %s |%s", (char*)filename.c_str(), m, line); fclose(f); return false; }
+#define EXIT_WITH_MSG(m) { fprintf(stderr, "%s: %s |%s", (char*)filename.c_str(), m, line); fclose(f); return NULL; }
 
 Pixel *LoadPPM(std::string filename) {
     Pixel *image_=NULL; 
     int width_,height_;
     FILE *f = fopen((char*)filename.c_str(), "r");
-    if (f == NULL) return false;
+    if (f == NULL) return NULL;
     char header_buf[256];
     const char *line = ReadLine(f, header_buf, sizeof(header_buf));
     if (sscanf(line, "P6 ") == EOF) EXIT_WITH_MSG("Can only handle P6 as PPM type.");
