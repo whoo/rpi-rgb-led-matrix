@@ -18,13 +18,11 @@ int main(int argc,char **argv)
 	{
 		"http://www.france24.com/fr/actualites/rss",
 		"http://www.france24.com/fr/europe/rss/",
-		"http://rss.lapresse.ca/179.xml",
-		"https://news.google.com/news/feeds?pz=1&cf=all&ned=fr&hl=fr&topic=t&output=rss",
-		"https://news.google.com/news/feeds?pz=1&cf=all&ned=fr&hl=fr&output=rss"
+		"http://rss.lapresse.ca/179.xml"
 	};
 
 	srand (time(NULL));
-	std::string news=url[(int) (5.0 * (rand() / (RAND_MAX + 1.0)))];
+	std::string news=url[(int) (3.0 * (rand() / (RAND_MAX + 1.0)))];
 	//std::cout<<news<<std::endl;
 
 
